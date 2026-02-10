@@ -134,6 +134,29 @@ This project can use SQLite for a lightweight, reliable leaderboard without crea
 
 The PHP endpoints `api/save_score.php` and `api/get_scores.php` will automatically use `leaderboard.sqlite`.
 
+### MySQL / phpMyAdmin (optional)
+
+If you'd rather use MySQL (phpMyAdmin) — for example you already have a database or expect heavier traffic — follow these steps:
+
+1. Create a database and a user in Plesk or phpMyAdmin. Note the DB name, user and password.
+2. Import the provided SQL dump into that database (you can use phpMyAdmin -> Import). The dump creates the `leaderboard` table.
+3. In the `api/` folder create a `config.php` file based on `config.sample.php` and set your DSN/user/pass. Example `api/config.php`:
+
+```php
+<?php
+return [
+   'dsn' => 'mysql:host=localhost;dbname=your_db_name;charset=utf8mb4',
+   'user' => 'your_db_user',
+   'pass' => 'your_db_password',
+];
+```
+
+4. After `api/config.php` exists the API will automatically use MySQL instead of SQLite. Test by playing a round — `api/save_score.php` should return JSON `{status: 'ok', rank: N}` and `api/get_scores.php` should return the top rows.
+
+Notes:
+- If you later remove `api/config.php`, the API will fall back to SQLite.
+- Make sure PHP on your host includes PDO MySQL (`pdo_mysql`) extension — most Plesk PHP builds include it.
+
 ## 📄 License
 
 Feel free to use and modify for personal or commercial projects.

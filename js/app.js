@@ -62,6 +62,20 @@ if (elements.refreshLeaderboard) {
   elements.refreshLeaderboard.addEventListener('click', fetchLeaderboard);
 }
 
+// Persist player name locally so it's not lost and not Anonymous
+const PLAYER_KEY = 'wb_player_name';
+if (elements.playerName) {
+  // load stored name
+  const stored = localStorage.getItem(PLAYER_KEY);
+  if (stored && !elements.playerName.value) elements.playerName.value = stored;
+
+  // save on change
+  elements.playerName.addEventListener('input', (e) => {
+    const v = (e.target.value || '').trim().substring(0, 20);
+    localStorage.setItem(PLAYER_KEY, v);
+  });
+}
+
 function startGame() {
   score = 0;
   timeLeft = 5;
@@ -154,7 +168,8 @@ function endGame() {
 
   // Submit score to leaderboard if available
   try {
-    const name = (elements.playerName && elements.playerName.value.trim()) || 'Anonymous';
+    let name = 'Anonymous';
+    if (elements.playerName) name = elements.playerName.value.trim() || localStorage.getItem(PLAYER_KEY) || 'Anonymous';
     if (score > 0) submitScore(name, score);
   } catch (e) {
     console.warn('Leaderboard submit failed', e);
@@ -220,7 +235,21 @@ function submitScore(name, score) {
     if (!res.ok) throw new Error('Failed to save');
     return res.json();
   })
-  .then(() => fetchLeaderboard())
+  .then((json) => {
+    // If server accepted and returned rank, show it in the end modal
+    if (json && json.status === 'ok') {
+      try {
+        if (elements.endMsg) {
+          const rank = json.rank ? Number(json.rank) : null;
+          if (rank) {
+            // append rank info to end message
+            elements.endMsg.innerHTML += `<p>Your leaderboard rank: <strong>${rank}</strong></p>`;
+          }
+        }
+      } catch (e) { /* ignore UI errors */ }
+    }
+    fetchLeaderboard();
+  })
   .catch(err => {
     console.warn('Save score failed, saving locally', err);
     // Fallback: save to local leaderboard in localStorage
