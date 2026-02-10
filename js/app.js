@@ -11,7 +11,10 @@ const words = [
   'Debug', 'Error', 'Warning', 'Exception', 'Syntax',
   'Performance', 'Security', 'Encryption', 'Authentication', 'Authorization',
   'Cloud', 'Container', 'Virtual', 'Machine', 'Process',
-  'Memory', 'Storage', 'Cache', 'Queue', 'Stack'
+  'Memory', 'Storage', 'Cache', 'Queue', 'Stack',
+  'Speed', 'Power', 'Energy', 'Light', 'Sound',
+  'Music', 'Art', 'Dance', 'Sport', 'Game',
+  'Book', 'Movie', 'Show', 'Picture', 'Video'
 ];
 
 let currentWord = '';
@@ -29,7 +32,6 @@ const elements = {
   highscore: document.getElementById('highscore'),
   startBtn: document.getElementById('start'),
   restartBtn: document.getElementById('restart'),
-  bomb: document.querySelector('.bomb'),
   overlay: document.getElementById('overlay'),
   overlayRestart: document.getElementById('overlay-restart'),
   endTitle: document.getElementById('end-title'),
@@ -37,7 +39,7 @@ const elements = {
   finalScore: document.getElementById('final-score')
 };
 
-// Initialize
+// Initialize high score display
 elements.highscore.textContent = highScore;
 
 // Event listeners
@@ -45,8 +47,12 @@ elements.startBtn.addEventListener('click', startGame);
 elements.restartBtn.addEventListener('click', startGame);
 elements.overlayRestart.addEventListener('click', startGame);
 elements.input.addEventListener('input', handleInput);
-elements.input.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') handleInput();
+elements.input.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    // Trigger input check and clear for next word
+    handleInput();
+  }
 });
 
 function startGame() {
@@ -60,19 +66,16 @@ function startGame() {
   elements.startBtn.classList.add('hidden');
   elements.restartBtn.classList.remove('hidden');
   elements.overlay.classList.add('hidden');
-  elements.bomb.classList.remove('exploding');
   
   nextWord();
   startTimer();
 }
 
 function nextWord() {
-  currentWord = words[Math.floor(Math.random() * words.length)];
+  currentWord = words[Math.floor(Math.random() * words.length)].toUpperCase();
   elements.word.textContent = currentWord;
   elements.input.value = '';
   elements.input.classList.remove('correct', 'wrong');
-  timeLeft = 5;
-  elements.timer.textContent = '5.0';
 }
 
 function startTimer() {
@@ -95,19 +98,20 @@ function startTimer() {
 function handleInput() {
   if (!gameRunning) return;
   
-  const input = elements.input.value.trim();
+  const input = elements.input.value.trim().toUpperCase();
   
-  if (input.toLowerCase() === currentWord.toLowerCase()) {
+  if (input === currentWord) {
     elements.input.classList.add('correct');
     elements.input.classList.remove('wrong');
     
     score++;
     elements.score.textContent = score;
     
+    // Clear input for next word after brief delay
     setTimeout(() => {
       nextWord();
-    }, 300);
-  } else if (input.length > 0 && !currentWord.toLowerCase().startsWith(input.toLowerCase())) {
+    }, 200);
+  } else if (input.length > 0 && !currentWord.startsWith(input)) {
     elements.input.classList.add('wrong');
     elements.input.classList.remove('correct');
   } else {
@@ -127,21 +131,22 @@ function endGame() {
   }
   
   // Show end screen
-  elements.bomb.classList.add('exploding');
   elements.startBtn.classList.remove('hidden');
   elements.restartBtn.classList.add('hidden');
   elements.input.disabled = true;
   
   setTimeout(() => {
-    elements.endTitle.textContent = score > 0 ? 'Game Over!' : 'Boom!';
+    elements.endTitle.textContent = 'Game Over';
     elements.finalScore.textContent = score;
     elements.endMsg.innerHTML = score > 0 
-      ? `You scored <strong>${score}</strong> word${score !== 1 ? 's' : ''}!`
-      : 'You scored <strong>0</strong>. Try again!';
+      ? `You typed <strong>${score} word${score !== 1 ? 's' : ''}</strong>. Nice!`
+      : 'Try again!';
     elements.overlay.classList.remove('hidden');
     elements.input.disabled = false;
-  }, 600);
+  }, 300);
 }
 
 // Focus input on load
-elements.input.focus();
+window.addEventListener('load', () => {
+  elements.input.focus();
+});

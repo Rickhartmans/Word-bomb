@@ -3,46 +3,73 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Word Bomb</title>
+    <title>Word Bomb - Fast Typing Game</title>
     <link rel="stylesheet" href="css/styles.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   </head>
   <body>
-    <main class="wrap">
-      <header class="header">
-        <h1 class="title">Word Bomb</h1>
-        <p class="subtitle">Type the word before the bomb explodes!</p>
-      </header>
+    <div class="background-effect"></div>
+    
+    <main class="container">
+      <div class="header-top">
+        <h1 class="logo">💣 Word Bomb</h1>
+        <div class="stats">
+          <div class="stat-item">
+            <span class="stat-label">Score</span>
+            <span class="stat-value" id="score">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">High Score</span>
+            <span class="stat-value" id="highscore">0</span>
+          </div>
+        </div>
+      </div>
 
-      <section class="card" id="game-card">
-        <div class="info-row">
-          <div class="score">Score: <span id="score">0</span></div>
-          <div class="timer">Time: <span id="timer">5.0</span>s</div>
+      <section class="game-arena" id="game-arena">
+        <div class="timer-display">
+          <div class="timer-ring">
+            <div class="timer-circle">
+              <span id="timer">00.0</span>
+            </div>
+          </div>
         </div>
 
-        <div class="bomb-area">
-          <div class="bomb">💣</div>
-          <div class="word" id="word">—</div>
+        <div class="word-display">
+          <div class="word-text" id="word">—</div>
         </div>
 
-        <div class="controls">
-          <input id="input" placeholder="Type the word here" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-          <div class="buttons">
-            <button id="start">Start Game</button>
-            <button id="restart" class="hidden">Play Again</button>
+        <div class="game-controls">
+          <input 
+            id="input" 
+            type="text"
+            class="input-field"
+            placeholder="Start typing..."
+            autocomplete="off" 
+            autocorrect="off" 
+            autocapitalize="off" 
+            spellcheck="false">
+          <div class="button-group">
+            <button id="start" class="btn btn-primary">Start Game</button>
+            <button id="restart" class="btn btn-secondary hidden">Play Again</button>
           </div>
         </div>
       </section>
 
-      <footer class="footer">
-        <small>High score: <span id="highscore">0</span></small>
-      </footer>
-
-      <div id="overlay" class="overlay hidden">
-        <div class="modal">
-          <h2 id="end-title">Boom!</h2>
-          <p id="end-msg">You scored <strong id="final-score">0</strong>.</p>
-          <button id="overlay-restart">Play Again</button>
+      <div id="overlay" class="modal-overlay hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 id="end-title">Game Over</h2>
+          </div>
+          <div class="modal-body">
+            <div class="final-score">
+              <span id="final-score">0</span>
+              <span class="score-label">Words</span>
+            </div>
+            <p id="end-msg"></p>
+          </div>
+          <div class="modal-footer">
+            <button id="overlay-restart" class="btn btn-primary">Play Again</button>
+          </div>
         </div>
       </div>
     </main>
