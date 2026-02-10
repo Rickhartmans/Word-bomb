@@ -1,21 +1,20 @@
 <?php
 header('Content-Type: application/json');
 
-$path = __DIR__ . '/scores.json';
-$max = isset($_GET['max']) ? intval($_GET['max']) : 10;
+require_once __DIR__ . '/db.php';
+$pdo = getDB();
 
-if (!file_exists($path)) {
+$max = isset($_GET['max']) ? intval($_GET['max']) : 10;
+if ($max < 1) $max = 10;
+
+try {
+    $stmt = $pdo->prepare('SELECT name, score, ts FROM leaderboard ORDER BY score DESC, ts ASC LIMIT :max');
+    $stmt->bindValue(':max', $max, PDO::PARAM_INT);
+    $stmt->execute();
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    echo json_encode($rows);
+} catch (Exception $e) {
+    http_response_code(500);
     echo json_encode([]);
-    exit;
 }
 
-$data = json_decode(file_get_contents($path), true);
-if (!is_array($data)) $data = [];
-
-usort($data, function($a, $b){
-    return $b['score'] - $a['score'];
-});
-
-$data = array_slice($data, 0, $max);
-
-echo json_encode($data);

@@ -178,10 +178,19 @@ function fetchLeaderboard() {
   if (!elements.leaderboardList) return;
   elements.leaderboardList.innerHTML = '<li class="loading">Loading...</li>';
   fetch(GET_SCORES_URL)
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) throw new Error('Network response was not ok');
+      return res.json();
+    })
     .then(data => renderLeaderboard(data))
     .catch(() => {
-      elements.leaderboardList.innerHTML = '<li class="loading">Could not load</li>';
+      // If server is unavailable, fall back to localStorage leaderboard
+      const fallback = loadLocalLeaderboard();
+      if (fallback && fallback.length) {
+        renderLeaderboard(fallback);
+      } else {
+        elements.leaderboardList.innerHTML = '<li class="loading">Could not load leaderboard</li>';
+      }
     });
 }
 
@@ -207,7 +216,37 @@ function submitScore(name, score) {
     method: 'POST',
     body: form
   })
-  .then(res => res.json())
+  .then(res => {
+    if (!res.ok) throw new Error('Failed to save');
+    return res.json();
+  })
   .then(() => fetchLeaderboard())
-  .catch(err => console.warn('Save score failed', err));
+  .catch(err => {
+    console.warn('Save score failed, saving locally', err);
+    // Fallback: save to local leaderboard in localStorage
+    saveLocalScore(name, score);
+    fetchLeaderboard();
+  });
+}
+
+// --- LocalStorage fallback leaderboard -------------------------------
+const LOCAL_KEY = 'wb_local_scores';
+function loadLocalLeaderboard() {
+  try {
+    const raw = localStorage.getItem(LOCAL_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) return [];
+    return arr.sort((a,b)=>b.score-a.score).slice(0,10);
+  } catch (e) { return []; }
+}
+
+function saveLocalScore(name, score) {
+  try {
+    const arr = loadLocalLeaderboard() || [];
+    arr.push({name: String(name).substring(0,20), score: Number(score)||0});
+    arr.sort((a,b)=>b.score-a.score);
+    const sliced = arr.slice(0,50);
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(sliced));
+  } catch (e) { console.warn('Local save failed', e); }
 }

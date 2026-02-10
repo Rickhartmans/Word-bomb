@@ -118,6 +118,22 @@ Security and limits:
 - The PHP scripts perform simple sanitization and cap scores. This is intended as a lightweight leaderboard and not hardened for production abuse.
 - For a multi-player or public deployment, consider adding server-side rate limiting, authentication, or storing scores in a database.
 
+### SQLite (recommended)
+
+This project can use SQLite for a lightweight, reliable leaderboard without creating a separate database server. Steps:
+
+1. Upload the `api/` folder to your site (keep the files in place).
+2. Ensure the webserver user can create and write files in `api/` (so `leaderboard.sqlite` can be created).
+3. Optionally, if you previously had `api/scores.json`, run the migration once by visiting (in a browser or via CLI):
+
+   - Browser: `https://your-domain.tld/Word-bomb/api/migrate_json_to_sqlite.php`
+   - CLI (from project folder):
+     ```powershell
+     php api/migrate_json_to_sqlite.php
+     ```
+
+The PHP endpoints `api/save_score.php` and `api/get_scores.php` will automatically use `leaderboard.sqlite`.
+
 ## 📄 License
 
 Feel free to use and modify for personal or commercial projects.
