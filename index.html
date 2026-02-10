@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Word Bomb</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <main class="wrap">
+      <header class="header">
+        <h1 class="title">Word Bomb</h1>
+        <p class="subtitle">Type the word before the bomb explodes!</p>
+      </header>
+
+      <section class="card" id="game-card">
+        <div class="info-row">
+          <div class="score">Score: <span id="score">0</span></div>
+          <div class="timer">Time: <span id="timer">5.0</span>s</div>
+        </div>
+
+        <div class="bomb-area">
+          <div class="bomb">💣</div>
+          <div class="word" id="word">—</div>
+        </div>
+
+        <div class="controls">
+          <input id="input" placeholder="Type the word here" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          <div class="buttons">
+            <button id="start">Start Game</button>
+            <button id="restart" class="hidden">Play Again</button>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <small>High score: <span id="highscore">0</span></small>
+      </footer>
+
+      <div id="overlay" class="overlay hidden">
+        <div class="modal">
+          <h2 id="end-title">Boom!</h2>
+          <p id="end-msg">You scored <strong id="final-score">0</strong>.</p>
+          <button id="overlay-restart">Play Again</button>
+        </div>
+      </div>
+    </main>
+
+    <script src="js/app.js"></script>
+  </body>
+</html>
