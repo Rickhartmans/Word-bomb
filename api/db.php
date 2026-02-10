@@ -16,6 +16,22 @@ function getDB() {
                     PDO::ATTR_EMULATE_PREPARES => false,
                     PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
                 ]);
+                // Ensure necessary tables exist for MySQL as well
+                $pdo->exec("CREATE TABLE IF NOT EXISTS users (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    username VARCHAR(50) NOT NULL UNIQUE,
+                    passhash VARCHAR(255) NOT NULL,
+                    created_ts INT NOT NULL
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+                $pdo->exec("CREATE TABLE IF NOT EXISTS leaderboard (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    user_id INT NULL,
+                    name VARCHAR(50) NOT NULL,
+                    score INT NOT NULL DEFAULT 0,
+                    ts INT NOT NULL,
+                    ip VARCHAR(45)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+                $pdo->exec("CREATE INDEX IF NOT EXISTS idx_score ON leaderboard(score)");
                 return $pdo;
             } catch (Exception $e) {
                 http_response_code(500);

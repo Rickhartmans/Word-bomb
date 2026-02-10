@@ -42,6 +42,13 @@ const elements = {
   finalScore: document.getElementById('final-score')
 };
 
+// Auth/UI elements (may be absent)
+const accountButton = document.getElementById('account-button');
+const authModal = document.getElementById('auth-modal');
+const authForm = document.getElementById('auth-form');
+const authModeToggle = document.getElementById('auth-mode');
+const authCancel = document.getElementById('auth-cancel');
+
 // Initialize high score display
 elements.highscore.textContent = highScore;
 
@@ -75,6 +82,42 @@ if (elements.playerName) {
     localStorage.setItem(PLAYER_KEY, v);
   });
 }
+
+// Auth handling: show modal and submit
+function fetchAccount() {
+  fetch('/api/get_account.php').then(r=>r.json()).then(data=>{
+    if (data && data.user) {
+      elements.playerName.value = data.user.username || elements.playerName.value;
+      if (accountButton) accountButton.textContent = data.user.username;
+    }
+  }).catch(()=>{});
+}
+
+if (accountButton) {
+  accountButton.addEventListener('click', ()=>{
+    if (authModal) authModal.classList.remove('hidden');
+  });
+}
+
+if (authCancel) authCancel.addEventListener('click', ()=>{ if (authModal) authModal.classList.add('hidden'); });
+
+if (authForm) authForm.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const form = new FormData(authForm);
+  const mode = authModeToggle && authModeToggle.value === 'register' ? 'register' : 'login';
+  const url = mode === 'register' ? '/api/register.php' : '/api/login.php';
+  fetch(url, {method:'POST', body: form}).then(r=>r.json()).then(j=>{
+    if (j && j.status === 'ok') {
+      if (authModal) authModal.classList.add('hidden');
+      fetchAccount();
+    } else {
+      alert(j.message || 'Auth error');
+    }
+  }).catch(()=>{ alert('Network error'); });
+});
+
+// Try to get account on load
+fetchAccount();
 
 function startGame() {
   score = 0;

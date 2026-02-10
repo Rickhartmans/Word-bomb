@@ -47,6 +47,7 @@
               placeholder="Your name (max 20 chars)"
               maxlength="20"
               autocomplete="name">
+            <button id="account-button" class="btn btn-secondary">Account</button>
             <div class="button-group small">
               <button id="start" class="btn btn-primary">Start Game</button>
               <button id="restart" class="btn btn-secondary hidden">Play Again</button>
@@ -90,6 +91,37 @@
           </div>
         </div>
       </div>
+    
+    <div id="auth-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="auth-title">Login / Register</h2>
+        </div>
+        <div class="modal-body">
+          <form id="auth-form">
+            <label>
+              Mode:
+              <select id="auth-mode">
+                <option value="login">Login</option>
+                <option value="register">Register</option>
+              </select>
+            </label>
+            <label>
+              Username
+              <input name="username" type="text" required maxlength="50">
+            </label>
+            <label>
+              Password
+              <input name="password" type="password" required>
+            </label>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="button" id="auth-cancel" class="btn btn-secondary">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
     </main>
 
     <script src="js/app.js"></script>

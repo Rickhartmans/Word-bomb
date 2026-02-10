@@ -15,6 +15,11 @@ try {
     echo json_encode($rows);
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode([]);
+    // If debug flag is present, return the error message to help troubleshooting.
+    if (isset($_GET['debug']) && $_GET['debug']) {
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    } else {
+        echo json_encode([]);
+    }
 }
 
