@@ -27,6 +27,9 @@ let timerInterval = null;
 const elements = {
   word: document.getElementById('word'),
   input: document.getElementById('input'),
+  playerName: document.getElementById('player-name'),
+  leaderboardList: document.getElementById('leaderboard-list'),
+  refreshLeaderboard: document.getElementById('refresh-leaderboard'),
   score: document.getElementById('score'),
   timer: document.getElementById('timer'),
   highscore: document.getElementById('highscore'),
@@ -54,6 +57,10 @@ elements.input.addEventListener('keydown', (e) => {
     handleInput();
   }
 });
+
+if (elements.refreshLeaderboard) {
+  elements.refreshLeaderboard.addEventListener('click', fetchLeaderboard);
+}
 
 function startGame() {
   score = 0;
@@ -144,9 +151,63 @@ function endGame() {
     elements.overlay.classList.remove('hidden');
     elements.input.disabled = false;
   }, 300);
+
+  // Submit score to leaderboard if available
+  try {
+    const name = (elements.playerName && elements.playerName.value.trim()) || 'Anonymous';
+    if (score > 0) submitScore(name, score);
+  } catch (e) {
+    console.warn('Leaderboard submit failed', e);
+  }
 }
 
-// Focus input on load
+// Focus input on load and initialize leaderboard
 window.addEventListener('load', () => {
   elements.input.focus();
+  // fetch leaderboard on load
+  fetchLeaderboard();
+  // refresh leaderboard regularly
+  setInterval(fetchLeaderboard, 10000);
 });
+
+// --- Leaderboard API -------------------------------------------------
+const GET_SCORES_URL = 'api/get_scores.php?max=10';
+const SAVE_SCORE_URL = 'api/save_score.php';
+
+function fetchLeaderboard() {
+  if (!elements.leaderboardList) return;
+  elements.leaderboardList.innerHTML = '<li class="loading">Loading...</li>';
+  fetch(GET_SCORES_URL)
+    .then(res => res.json())
+    .then(data => renderLeaderboard(data))
+    .catch(() => {
+      elements.leaderboardList.innerHTML = '<li class="loading">Could not load</li>';
+    });
+}
+
+function renderLeaderboard(data) {
+  if (!elements.leaderboardList) return;
+  if (!Array.isArray(data) || data.length === 0) {
+    elements.leaderboardList.innerHTML = '<li>No scores yet</li>';
+    return;
+  }
+  elements.leaderboardList.innerHTML = data.map((row, idx) => {
+    const safeName = String(row.name).substring(0, 20);
+    const safeScore = Number(row.score) || 0;
+    return `<li><span class="name">${idx+1}. ${safeName}</span><span class="score">${safeScore}</span></li>`;
+  }).join('');
+}
+
+function submitScore(name, score) {
+  const form = new FormData();
+  form.append('name', name);
+  form.append('score', String(score));
+
+  fetch(SAVE_SCORE_URL, {
+    method: 'POST',
+    body: form
+  })
+  .then(res => res.json())
+  .then(() => fetchLeaderboard())
+  .catch(err => console.warn('Save score failed', err));
+}

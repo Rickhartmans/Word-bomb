@@ -39,6 +39,20 @@
         </div>
 
         <div class="game-controls">
+          <div class="player-row">
+            <input 
+              id="player-name"
+              type="text"
+              class="input-field name-field"
+              placeholder="Your name (max 20 chars)"
+              maxlength="20"
+              autocomplete="name">
+            <div class="button-group small">
+              <button id="start" class="btn btn-primary">Start Game</button>
+              <button id="restart" class="btn btn-secondary hidden">Play Again</button>
+            </div>
+          </div>
+
           <input 
             id="input" 
             type="text"
@@ -48,11 +62,15 @@
             autocorrect="off" 
             autocapitalize="off" 
             spellcheck="false">
-          <div class="button-group">
-            <button id="start" class="btn btn-primary">Start Game</button>
-            <button id="restart" class="btn btn-secondary hidden">Play Again</button>
-          </div>
         </div>
+
+        <aside class="leaderboard" id="leaderboard">
+          <h3>Leaderboard</h3>
+          <ol id="leaderboard-list">
+            <li class="loading">Loading...</li>
+          </ol>
+          <button id="refresh-leaderboard" class="btn btn-secondary">Refresh</button>
+        </aside>
       </section>
 
       <div id="overlay" class="modal-overlay hidden">
