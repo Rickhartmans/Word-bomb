@@ -99,6 +99,25 @@ let timeLeft = 5; // Change this number
 - **Works offline** – once loaded, the game runs without internet
 - **Mobile friendly** – fully responsive with touch support
 
+## 📊 Leaderboard (server)
+
+This project now includes a simple server-backed leaderboard. It uses two PHP endpoints in `api/`:
+
+- `api/save_score.php` — accepts POST `name` and `score` to save a score
+- `api/get_scores.php` — returns the top scores as JSON (query param `max`)
+
+Setup notes for Plesk:
+
+1. Ensure PHP is enabled for the domain (most Plesk plans support PHP).
+2. Upload the `api/` folder alongside `index.html` (preserve structure).
+3. Make the file `api/scores.json` writable by the webserver user (chmod 0664 or 0666 as needed).
+4. Visit the site and test a game — the client will POST scores automatically when a game ends.
+
+Security and limits:
+
+- The PHP scripts perform simple sanitization and cap scores. This is intended as a lightweight leaderboard and not hardened for production abuse.
+- For a multi-player or public deployment, consider adding server-side rate limiting, authentication, or storing scores in a database.
+
 ## 📄 License
 
 Feel free to use and modify for personal or commercial projects.
